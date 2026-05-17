@@ -1,14 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
-import { db } from '../db'
-import { loadDrills, type Drill, DRILL_COUNTS } from '../content/drills'
+import { db, type SectionTag } from '../db'
+import {
+  loadDrills,
+  matchesFilter,
+  type Drill,
+  type DrillFilter,
+} from '../content/drills'
 
 interface Props {
+  filter: DrillFilter
   onDone: () => void
 }
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E'] as const
 
-export function QuickDrill({ onDone }: Props) {
+export function QuickDrill({ filter, onDone }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [queue, setQueue] = useState<Drill[] | null>(null)
   const [chosen, setChosen] = useState<number | null>(null)
@@ -20,14 +26,13 @@ export function QuickDrill({ onDone }: Props) {
   const sessionStartedAtRef = useRef<number>(Date.now())
   const attemptStartedAtRef = useRef<number>(Date.now())
 
-  // Load + shuffle the drill pool. Each mount draws a fresh random ordering;
-  // running short would mean she's done 6,000+ — not happening.
   useEffect(() => {
     let cancelled = false
     loadDrills()
       .then(drills => {
         if (cancelled) return
-        const shuffled = [...drills]
+        const filtered = drills.filter(d => matchesFilter(d, filter))
+        const shuffled = [...filtered]
         for (let i = shuffled.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1))
           ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
@@ -39,15 +44,20 @@ export function QuickDrill({ onDone }: Props) {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [filter])
 
   async function ensureSession(): Promise<number> {
     if (sessionIdRef.current !== null) return sessionIdRef.current
+    // Tag the session with the section filter when it's a single section,
+    // so per-section stats reflect what she actually drilled.
+    const sectionTag: SectionTag | undefined =
+      filter.type === 'LR' ? 'LR' : filter.type === 'RC' ? 'RC' : undefined
     const id = (await db.sessions.add({
       startedAt: sessionStartedAtRef.current,
       endedAt: Date.now(),
       type: 'drill',
       durationMin: 0,
+      sectionTag,
     })) as number
     sessionIdRef.current = id
     return id
@@ -104,7 +114,7 @@ export function QuickDrill({ onDone }: Props) {
     return (
       <Frame onClose={onDone}>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-paper/70 mb-2">Loading {DRILL_COUNTS.total.toLocaleString()} drills…</p>
+          <p className="text-paper/70 mb-2">Loading drills…</p>
           <p className="text-paper/50 text-xs">First load takes a few seconds — cached after that.</p>
         </div>
       </Frame>

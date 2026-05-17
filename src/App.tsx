@@ -4,14 +4,17 @@ import { Pomodoro } from './screens/Pomodoro'
 import { LogExternal } from './screens/LogExternal'
 import { Settings } from './screens/Settings'
 import { QuickDrill } from './screens/QuickDrill'
+import { DrillFilterPicker } from './screens/DrillFilterPicker'
 import { ensureMeta } from './db'
+import type { DrillFilter } from './content/drills'
 
 type Screen =
   | { kind: 'home' }
   | { kind: 'pomodoro'; minutes: number }
   | { kind: 'log-external' }
   | { kind: 'settings' }
-  | { kind: 'quick-drill' }
+  | { kind: 'drill-filter' }
+  | { kind: 'quick-drill'; filter: DrillFilter }
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>({ kind: 'home' })
@@ -29,7 +32,13 @@ export default function App() {
           onStartPomodoro={(minutes) => setScreen({ kind: 'pomodoro', minutes })}
           onOpenLog={() => setScreen({ kind: 'log-external' })}
           onOpenSettings={() => setScreen({ kind: 'settings' })}
-          onStartDrill={() => setScreen({ kind: 'quick-drill' })}
+          onStartDrill={() => setScreen({ kind: 'drill-filter' })}
+        />
+      )}
+      {screen.kind === 'drill-filter' && (
+        <DrillFilterPicker
+          onStart={(filter) => setScreen({ kind: 'quick-drill', filter })}
+          onCancel={() => setScreen({ kind: 'home' })}
         />
       )}
       {screen.kind === 'pomodoro' && (
@@ -48,7 +57,10 @@ export default function App() {
         <Settings onClose={() => setScreen({ kind: 'home' })} />
       )}
       {screen.kind === 'quick-drill' && (
-        <QuickDrill onDone={() => setScreen({ kind: 'home' })} />
+        <QuickDrill
+          filter={screen.filter}
+          onDone={() => setScreen({ kind: 'home' })}
+        />
       )}
     </div>
   )

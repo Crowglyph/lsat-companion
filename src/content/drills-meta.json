@@ -1,8 +1,39 @@
 {
-  "generatedAt": "2026-05-17T19:16:08.073Z",
+  "generatedAt": "2026-05-17T19:26:38.606Z",
   "counts": {
     "lr": 4520,
     "rc": 2366,
-    "total": 6886
+    "total": 6886,
+    "lrSubtypes": {
+      "resolve-paradox": 219,
+      "parallel": 230,
+      "other": 1351,
+      "inference": 40,
+      "flaw": 580,
+      "weaken": 343,
+      "cannot-be-true": 93,
+      "most-strongly-supported": 95,
+      "main-point": 170,
+      "must-be-true": 186,
+      "strengthen": 541,
+      "necessary-assumption": 288,
+      "point-at-issue": 34,
+      "sufficient-assumption": 116,
+      "principle-identify": 100,
+      "method": 41,
+      "role": 78,
+      "parallel-flaw": 10,
+      "principle-strengthen": 5
+    },
+    "rcSubtypes": {
+      "main-point": 356,
+      "application": 191,
+      "detail": 208,
+      "other": 1109,
+      "inference": 161,
+      "attitude": 145,
+      "function": 13,
+      "comparative": 183
+    }
   }
 }
