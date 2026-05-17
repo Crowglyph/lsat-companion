@@ -23,13 +23,14 @@ export function Capybara({ expression, position = [0, 0, 0] }: Props) {
   // Eye blink state — driven by elapsed time
   const blinkSeed = useMemo(() => Math.random() * 7, [])
 
-  // Materials
+  // Materials — sit on the warm-mid palette band so the pet reads bright
+  // against the cool back wall.
   const mats = useMemo(() => {
-    const fur = new THREE.MeshStandardMaterial({ color: 0x9a6d4a, roughness: 1.0 })
-    const furDark = new THREE.MeshStandardMaterial({ color: 0x6b4c3b, roughness: 1.0 })
-    const belly = new THREE.MeshStandardMaterial({ color: 0xb88a64, roughness: 1.0 })
+    const fur = new THREE.MeshStandardMaterial({ color: 0xc89366, roughness: 1.0 })
+    const furDark = new THREE.MeshStandardMaterial({ color: 0x8b5e3e, roughness: 1.0 })
+    const belly = new THREE.MeshStandardMaterial({ color: 0xe0b88a, roughness: 1.0 })
     const ink = new THREE.MeshStandardMaterial({ color: 0x10080a, roughness: 0.6 })
-    const nose = new THREE.MeshStandardMaterial({ color: 0x3a2018, roughness: 0.7 })
+    const nose = new THREE.MeshStandardMaterial({ color: 0x4a2820, roughness: 0.7 })
     return { fur, furDark, belly, ink, nose }
   }, [])
 

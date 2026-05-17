@@ -22,9 +22,9 @@ export function DeskStage() {
       emissiveIntensity: 0.4,
     }),
     lampGlow: new THREE.MeshStandardMaterial({
-      color: 0xffd9a0,
-      emissive: 0xffb86b,
-      emissiveIntensity: 2.2,
+      color: 0xffe8c4,
+      emissive: 0xffc88a,
+      emissiveIntensity: 4.5,
       roughness: 0.5,
     }),
     metal: new THREE.MeshStandardMaterial({ color: 0x2a201a, roughness: 0.6, metalness: 0.4 }),
@@ -110,8 +110,8 @@ export function DeskStage() {
         <mesh material={mats.lampGlow} position={[-0.62, 1.05, 0]}>
           <sphereGeometry args={[0.12, 10, 8]} />
         </mesh>
-        {/* Real point light from bulb */}
-        <pointLight position={[-0.62, 1.05, 0]} intensity={1.6} distance={6} decay={1.2} color={0xffd0a0} />
+        {/* Real point light from bulb — primary illumination for the pet */}
+        <pointLight position={[-0.62, 1.05, 0]} intensity={3.8} distance={7} decay={1.1} color={0xffd0a0} />
       </group>
 
       {/* A small stack of papers far-right edge */}
