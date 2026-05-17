@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Home } from './screens/Home'
 import { Pomodoro } from './screens/Pomodoro'
 import { LogExternal } from './screens/LogExternal'
 import { Settings } from './screens/Settings'
+import { ensureMeta } from './db'
 
 type Screen =
   | { kind: 'home' }
@@ -12,6 +13,12 @@ type Screen =
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>({ kind: 'home' })
+
+  // Belt-and-suspenders meta seed. The populate hook handles fresh installs;
+  // this catches any edge case where meta was wiped but DB exists.
+  useEffect(() => {
+    ensureMeta().catch(e => console.error('ensureMeta failed:', e))
+  }, [])
 
   return (
     <div className="h-full w-full bg-ink">

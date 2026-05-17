@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, ensureMeta } from '../db'
+import { db } from '../db'
 import { PetScene } from '../components/pet/PetScene'
 import { StreakBadge } from '../components/hud/StreakBadge'
 import { HiChip } from '../components/hud/HiChip'
@@ -19,7 +19,10 @@ interface Props {
 }
 
 export function Home({ onStartPomodoro, onOpenLog, onOpenSettings }: Props) {
-  const meta = useLiveQuery(async () => ensureMeta(), [])
+  // Pure-read queries only. The meta row is seeded by db.on('populate') +
+  // App.tsx's ensureMeta effect — writing inside useLiveQuery throws
+  // ReadOnlyError.
+  const meta = useLiveQuery(() => db.meta.get(1), [])
   const sessions = useLiveQuery(() => db.sessions.toArray(), []) ?? []
 
   const [sheetOpen, setSheetOpen] = useState(false)

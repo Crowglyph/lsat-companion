@@ -47,15 +47,17 @@ export class LexDB extends Dexie {
       attempts: '++id, drillId, sessionId, answeredAt',
       meta: 'id',
     })
+    // Seed the singleton meta row on first DB creation. This populate hook
+    // runs once, inside Dexie's open transaction — NEVER inside a liveQuery
+    // read context (which would throw ReadOnlyError).
+    this.on('populate', () => {
+      this.meta.add(makeFreshMeta())
+    })
   }
 }
 
-export const db = new LexDB()
-
-export async function ensureMeta(): Promise<Meta> {
-  const existing = await db.meta.get(1)
-  if (existing) return existing
-  const fresh: Meta = {
+function makeFreshMeta(): Meta {
+  return {
     id: 1,
     petName: 'Lex',
     hatchedAt: Date.now(),
@@ -63,6 +65,20 @@ export async function ensureMeta(): Promise<Meta> {
     graceUsedOnDate: null,
     version: 1,
   }
+}
+
+export const db = new LexDB()
+
+/**
+ * Belt-and-suspenders: call once from a useEffect at app start. Handles the
+ * rare case where the DB existed pre-populate-hook or the meta row was wiped.
+ * MUST NOT be called from inside a useLiveQuery — Dexie throws ReadOnlyError
+ * if a write runs in a read-only transaction context.
+ */
+export async function ensureMeta(): Promise<Meta> {
+  const existing = await db.meta.get(1)
+  if (existing) return existing
+  const fresh = makeFreshMeta()
   await db.meta.put(fresh)
   return fresh
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, ensureMeta, exportAll, importAll, type ExportBundle } from '../db'
+import { db, exportAll, importAll, type ExportBundle } from '../db'
 import { deriveLifetimeStats } from '../game/stats'
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function Settings({ onClose }: Props) {
-  const meta = useLiveQuery(() => ensureMeta(), [])
+  const meta = useLiveQuery(() => db.meta.get(1), [])
   const sessions = useLiveQuery(() => db.sessions.toArray(), []) ?? []
   const attempts = useLiveQuery(() => db.attempts.toArray(), []) ?? []
   const [renameValue, setRenameValue] = useState('')
