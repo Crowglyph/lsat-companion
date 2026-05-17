@@ -10,15 +10,16 @@ import { deriveStreak, shouldConsumeGrace, todayKey } from '../game/streak'
 import { lastInteractionAt } from '../game/stats'
 import { expressionFor, hungerNow, moodNow } from '../game/pet'
 import { POMODORO_LENGTHS } from '../game/balance'
-import { drills } from '../content/drills'
+import { DRILLS_AVAILABLE, DRILL_COUNTS } from '../content/drills'
 
 interface Props {
   onStartPomodoro: (minutes: number) => void
   onOpenLog: () => void
   onOpenSettings: () => void
+  onStartDrill: () => void
 }
 
-export function Home({ onStartPomodoro, onOpenLog, onOpenSettings }: Props) {
+export function Home({ onStartPomodoro, onOpenLog, onOpenSettings, onStartDrill }: Props) {
   // Pure-read queries only. The meta row is seeded by db.on('populate') +
   // App.tsx's ensureMeta effect — writing inside useLiveQuery throws
   // ReadOnlyError.
@@ -114,17 +115,16 @@ export function Home({ onStartPomodoro, onOpenLog, onOpenSettings }: Props) {
           >
             Log external session
           </button>
-          {drills.length > 0 && (
+          {DRILLS_AVAILABLE && (
             <button
               type="button"
               className="w-full py-4 rounded-xl bg-lamp text-ink text-lg font-semibold active:scale-[0.98] transition"
               onClick={() => {
                 setSheetOpen(false)
-                // Quick drill will be wired when content lands
-                alert('Quick drill coming soon')
+                onStartDrill()
               }}
             >
-              Quick drill ({drills.length} available)
+              Quick drill · {DRILL_COUNTS.total.toLocaleString()} questions
             </button>
           )}
         </div>

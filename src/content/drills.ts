@@ -1,21 +1,47 @@
-// Drill content lives here. MVP ships with zero drills — the Quick Drill
-// option in the Study sheet is hidden until this array has rows.
+// Drill content lives in /drills.json (a static asset in public/), generated
+// by scripts/seed-from-hf.mjs from HuggingFace's tasksource/lsat-lr and
+// tasksource/lsat-rc datasets.
 //
-// Each drill targets short, low-friction practice (LR-style stimulus + question
-// + 5 choices, or a tiny RC fragment + a single question). Paste real content
-// from free LSAT sources and structure it to match the Drill shape below.
+// At ~14 MB raw, it's too large for the JS bundle — we lazy-fetch on demand
+// and rely on the service worker to cache it after first load.
+
+import meta from './drills-meta.json'
 
 export type DrillType = 'LR' | 'RC'
 
 export interface Drill {
   id: string
-  source: string            // e.g. "PT June 2007 §1 Q3"
+  source: string            // e.g. "PT 3 · LR1 Q1"
   type: DrillType
   stimulus: string
   stem: string
-  choices: [string, string, string, string, string]
-  correctIdx: 0 | 1 | 2 | 3 | 4
+  choices: string[]         // exactly 5
+  correctIdx: number        // 0-4
   explanationUrl?: string
 }
 
-export const drills: Drill[] = []
+interface Bundle {
+  generatedAt: string
+  source: string
+  counts: { lr: number; rc: number; total: number }
+  drills: Drill[]
+}
+
+export const DRILL_COUNTS = meta.counts
+export const DRILLS_AVAILABLE = meta.counts.total > 0
+
+let _cache: Drill[] | null = null
+let _loading: Promise<Drill[]> | null = null
+
+export function loadDrills(): Promise<Drill[]> {
+  if (_cache) return Promise.resolve(_cache)
+  if (_loading) return _loading
+  _loading = (async () => {
+    const r = await fetch('/drills.json')
+    if (!r.ok) throw new Error(`Failed to load drills.json: ${r.status}`)
+    const bundle = (await r.json()) as Bundle
+    _cache = bundle.drills
+    return _cache
+  })()
+  return _loading
+}

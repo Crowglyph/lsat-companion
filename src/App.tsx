@@ -3,6 +3,7 @@ import { Home } from './screens/Home'
 import { Pomodoro } from './screens/Pomodoro'
 import { LogExternal } from './screens/LogExternal'
 import { Settings } from './screens/Settings'
+import { QuickDrill } from './screens/QuickDrill'
 import { ensureMeta } from './db'
 
 type Screen =
@@ -10,6 +11,7 @@ type Screen =
   | { kind: 'pomodoro'; minutes: number }
   | { kind: 'log-external' }
   | { kind: 'settings' }
+  | { kind: 'quick-drill' }
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>({ kind: 'home' })
@@ -27,6 +29,7 @@ export default function App() {
           onStartPomodoro={(minutes) => setScreen({ kind: 'pomodoro', minutes })}
           onOpenLog={() => setScreen({ kind: 'log-external' })}
           onOpenSettings={() => setScreen({ kind: 'settings' })}
+          onStartDrill={() => setScreen({ kind: 'quick-drill' })}
         />
       )}
       {screen.kind === 'pomodoro' && (
@@ -43,6 +46,9 @@ export default function App() {
       )}
       {screen.kind === 'settings' && (
         <Settings onClose={() => setScreen({ kind: 'home' })} />
+      )}
+      {screen.kind === 'quick-drill' && (
+        <QuickDrill onDone={() => setScreen({ kind: 'home' })} />
       )}
     </div>
   )
