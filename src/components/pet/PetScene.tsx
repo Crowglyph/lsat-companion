@@ -46,7 +46,7 @@ export function PetScene({ expression }: Props) {
       />
 
       <DeskStage />
-      <Capybara expression={expression} position={[0, 0.55, 0.45]} />
+      <Capybara expression={expression} position={[0, 0.45, 0.45]} />
     </Canvas>
   )
 }
